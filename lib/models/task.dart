@@ -13,6 +13,23 @@ class TaskModel {
     this.isCompleted = false,
   });
 
+ ///Creates reusable map of tasks to be used when creating [tasks]
+  Map<String, dynamic> tasks(){
+    return{
+      'name':name,
+      'isComplete':isCompleted
+    };
+  }
+
+ ///Helps to maintain a consistent [tasks] structure 
+ ///Useful for adding different values of type [TaskModel] and ensuring the model stays consistent
+ factory TaskModel.fromMap(Map<String, dynamic> taskmap){
+     return TaskModel(
+      name: taskmap['name'],
+      isCompleted: taskmap['isCompleted'] ?? false
+      );
+ }
+
   /// Toggles the completion status of the task.
   void toggleCompleted() {
     isCompleted = !isCompleted;
