@@ -2,6 +2,13 @@ import 'package:to_do/models/task.dart';
 
 /// A class that represents the task data.
 class TaskService {
+  
+  ///Singleton Pattern Implementation for [TaskService]
+  ///Ensures only 1 [TaskService] is referenced
+  static final TaskService _instance= TaskService._internal();
+   factory TaskService()=> _instance;
+   TaskService._internal();
+  
   final List<TaskModel> _tasks = [
     TaskModel(name: 'Buy milk'),
     TaskModel(name: 'Buy eggs'),
