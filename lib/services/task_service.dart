@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do/models/task.dart';
@@ -71,11 +72,14 @@ final db=await database;
  });
 }
 
-  /// Updates the given [task] by toggling its completed status.
+  /// Updates the given [task] using .updatetask [db] and it checkes [where] the [task.name].
   ///
   /// The [task] parameter specifies the task to be updated.
-  void updateTask(TaskModel task) {
-    task.toggleCompleted();
+  Future <void> updateTask(TaskModel task) async{
+    final db= await database;
+    await db.update('tasks', task.tasks(),where: "name=?",whereArgs: [task.name]);
+    debugPrint('Task Updated successfully');
+    //task.toggleCompleted();
   }
 
   /// Deletes the given [task].
