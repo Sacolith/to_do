@@ -4,7 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:to_do/models/task.dart';
 
 /// A class that represents the task data.
-class TaskService {
+/// [ChangeNotifier] is necessary when working with provider to alert state changes
+class TaskService extends ChangeNotifier {
   
   ///Singleton Pattern Implementation for [TaskService]
   ///Ensures only 1 [TaskService] is referenced
@@ -34,23 +35,8 @@ class TaskService {
     },
     version: 1,
     );
-  }
-  // final List<TaskModel> _tasks = [
-  //   TaskModel(name: 'Buy milk'),
-  //   TaskModel(name: 'Buy eggs'),
-  //   TaskModel(name: 'Buy bread'),
-  // ];
+  }  
 
-  /// Getter for the list of tasks.
-  //List<TaskModel> get tasks => _tasks;
-
-  /// Getter for the number of tasks.
-  //int get taskCount => _tasks.length;
-
-  /// Adds a new task with the given [newTaskTitle].
-  ///
-  
-  
   /// Creates new [task] using the [TaskModel] as data structure.
   /// When adding a new item to [Database] we use .insert
   /// since 'task' is the name of the table we make reference to it when using .insert
@@ -59,7 +45,6 @@ class TaskService {
   Future <void> addTask(TaskModel task) async{
     final db=await database;
     await db.insert('task', task.tasks(), conflictAlgorithm: ConflictAlgorithm.replace);
-    //_tasks.add(TaskModel(name: newTaskTitle));
   }
 
 ///Creates a list of Tasks [taskcontents] from [database]
@@ -79,7 +64,7 @@ final db=await database;
     final db= await database;
     await db.update('tasks', task.tasks(),where: "name=?",whereArgs: [task.name]);
     debugPrint('Task Updated successfully');
-    //task.toggleCompleted();
+   
   }
 
   /// Deletes the given [task] with specific name.
@@ -88,6 +73,6 @@ final db=await database;
   Future <void> deleteTask(String name) async{
     final db= await database;
     await db.delete('tasks',where: 'name=?',whereArgs: [name]);
-    //_tasks.remove(task);
+   
   }
 }
