@@ -14,12 +14,14 @@ class TaskService {
 ///Creates a local sqflite database
   static Database? _database;
 
+///Database getter
   Future<Database> get database async{
     if(_database !=null) return _database!;
     _database= await _initDatabase();
     return _database!;
   }
 
+///Database initialization
   Future<Database> _initDatabase() async{
   String path= join(await getDatabasesPath(), 'task.db');
   return await openDatabase(
@@ -46,8 +48,16 @@ class TaskService {
 
   /// Adds a new task with the given [newTaskTitle].
   ///
-  /// The [newTaskTitle] parameter specifies the title of the new task.
-  void addTask(String newTaskTitle) {
+  
+  
+  /// Creates new [task] using the [TaskModel] as data structure.
+  /// When adding a new item to [Database] we use .insert
+  /// since 'task' is the name of the table we make reference to it when using .insert
+  /// local task model [task] insertes our new value into the [map] to ensure values a placed where they need to be
+  /// [conflictAlgorithm] for duplicate values
+  Future <void> addTask(TaskModel task) async{
+    final db=await database;
+    await db.insert('task', task.tasks(), conflictAlgorithm: ConflictAlgorithm.replace);
     //_tasks.add(TaskModel(name: newTaskTitle));
   }
 
