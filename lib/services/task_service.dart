@@ -45,7 +45,7 @@ class TaskService extends ChangeNotifier {
   Future <void> addTask(TaskModel task) async{
     final db=await database;
     await db.insert('task', task.tasks(), conflictAlgorithm: ConflictAlgorithm.replace);
-    notifyListeners(); //notifies when change has been made.
+  
   }
 
 ///Creates a list of Tasks [taskcontents] from [database]
@@ -65,7 +65,7 @@ final db=await database;
     final db= await database;
     await db.update('tasks', task.tasks(),where: "name=?",whereArgs: [task.name]);
     debugPrint('Task Updated successfully');
-   notifyListeners(); //notifies when change has been made.
+  
   }
 
   /// Deletes the given [task] with specific name.
@@ -75,6 +75,8 @@ final db=await database;
     final db= await database;
     await db.delete('tasks',where: 'name=?',whereArgs: [name]);
    debugPrint('Task deleted successfully');
-   notifyListeners(); //notifies when change has been made.
+  
   }
+
+  
 }

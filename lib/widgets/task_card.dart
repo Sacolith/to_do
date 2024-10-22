@@ -1,34 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/models/task.dart';
+import 'package:to_do/providers/task_provider.dart';
+
 
 /// A widget that represents a task card.
 class TaskCard extends StatelessWidget {
   /// Constructs a [TaskCard] widget.
   ///
-  /// The [isChecked] parameter specifies whether the task is checked or not.
-  /// The [taskTitle] parameter specifies the title of the task.
-  const TaskCard({super.key, required this.isChecked, required this.taskTitle});
+  
+  const TaskCard({super.key,required this.taskModel });
 
-  /// Indicates whether the task is checked or not.
-  final bool isChecked;
-
-  /// The title of the task.
-  final String taskTitle;
+final TaskModel taskModel;
+  
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        taskTitle,
-        style: TextStyle(
-            decoration: isChecked ? TextDecoration.lineThrough : null),
-      ),
-      trailing: Checkbox(
-        activeColor: Colors.lightBlueAccent,
-        value: isChecked,
-        onChanged: (value) {
-          // setState(() {
-          //   isChecked = value!;
-          // });
+    return Card(
+      child: ListTile(
+        title: Text(
+          taskModel.name,
+          style: TextStyle(
+              decoration: taskModel.isCompleted ? TextDecoration.lineThrough : null),
+        ),
+        trailing: Checkbox(
+          activeColor: Colors.lightBlueAccent,
+          value: taskModel.isCompleted,
+          onChanged: (bool? value) {
+            Provider.of<TaskProvider>(context, listen: false).toggleTaskCompletion(taskModel.name);
+          },
+        ),
+        onTap: (){
+         // Navigator.pushNamed(context, 'routeName')
         },
       ),
     );
