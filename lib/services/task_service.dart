@@ -1,3 +1,5 @@
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:to_do/models/task.dart';
 
 /// A class that represents the task data.
@@ -9,6 +11,27 @@ class TaskService {
    factory TaskService()=> _instance;
    TaskService._internal();
   
+///Creates a local sqflite database
+  static Database? _database;
+
+  Future<Database> get database async{
+    if(_database !=null) return _database!;
+    _database= await _initDatabase();
+    return _database!;
+  }
+
+  Future<Database> _initDatabase() async{
+  String path= join(await getDatabasesPath(), 'task.db');
+  return await openDatabase(
+    path,
+    onCreate: (db,version){
+      return db.execute(
+        'Create Table tasks(name TEXT PRIMARY KEY,isComplete INTEGER )'
+        );
+    },
+    version: 1,
+    );
+  }
   // final List<TaskModel> _tasks = [
   //   TaskModel(name: 'Buy milk'),
   //   TaskModel(name: 'Buy eggs'),
