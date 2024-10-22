@@ -61,6 +61,16 @@ class TaskService {
     //_tasks.add(TaskModel(name: newTaskTitle));
   }
 
+///Creates a list of Tasks [taskcontents] from [database]
+Future<List<TaskModel>> taskscontents() async{
+final db=await database;
+ final List<Map<String, dynamic>> maps= await db.query('tasks');
+
+ return List.generate(maps.length, (int i){
+  return TaskModel.fromMap(maps[i]);
+ });
+}
+
   /// Updates the given [task] by toggling its completed status.
   ///
   /// The [task] parameter specifies the task to be updated.
