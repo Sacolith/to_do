@@ -82,10 +82,12 @@ final db=await database;
     //task.toggleCompleted();
   }
 
-  /// Deletes the given [task].
+  /// Deletes the given [task] with specific name.
   ///
   /// The [task] parameter specifies the task to be deleted.
-  void deleteTask(TaskModel task) {
+  Future <void> deleteTask(String name) async{
+    final db= await database;
+    await db.delete('tasks',where: 'name=?',whereArgs: [name]);
     //_tasks.remove(task);
   }
 }
