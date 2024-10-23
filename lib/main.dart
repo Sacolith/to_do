@@ -6,7 +6,7 @@ import 'package:to_do/screens/home_screen.dart';
 void main() {
   runApp(const MainApp());
 }
-
+///Whenever you create a new [Provider] always initialize it in the highest Level of the app [main]
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 

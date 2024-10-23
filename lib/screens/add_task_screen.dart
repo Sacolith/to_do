@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/models/task.dart';
+import 'package:to_do/providers/task_provider.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  const AddTaskScreen({super.key});
+   AddTaskScreen({super.key, this.task});
 
+  final TextEditingController _nameController=TextEditingController();
+  final TaskModel? task;
+ 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       color: const Color(0xff757575),
       child: Container(
@@ -19,25 +26,41 @@ class AddTaskScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const Text(
-              'Add Task',
+            Text(task==null?
+              'Add Task':'Update task',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.deepOrangeAccent,
                 fontSize: 30.0,
               ),
             ),
-            const TextField(
+             TextField(
               autofocus: true,
+              controller: _nameController,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10.0),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                     if(_nameController.text.isEmpty){
+                      return;
+                     }
+                     final tm= TaskModel(
+                      name: _nameController.text,
+                      isCompleted: task?.isCompleted ?? false,
+                      );
+                     if(task==null){
+                      //adds a new task
+                      Provider.of<TaskProvider>(context, listen:false).addTask(tm);
+                     }
+                     //updates task
+                     Provider.of<TaskProvider>(context, listen: false).udpateTask(tm);
+                    Navigator.pop(context);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepOrangeAccent,
               ),
-              child: const Text('Add'),
+              child:  Text(task==null?'Add':'Update'),
             ),
           ],
         ),

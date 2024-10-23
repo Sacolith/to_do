@@ -31,7 +31,7 @@ final TaskModel taskModel;
           },
         ),
         onTap: (){
-         // Navigator.pushNamed(context, 'routeName')
+         // what happens to task when completed?
         },
       ),
     );

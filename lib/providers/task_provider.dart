@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:to_do/models/task.dart';
 import 'package:to_do/services/task_service.dart';
 
-
+/// [ChangeNotifier] Necessary for State Changes when working with provider
+/// [notifyListeners] is what signals the state change to the [Provider] in [main]
 class TaskProvider with ChangeNotifier{
   List<TaskModel> _task=[];
 
@@ -19,6 +20,7 @@ _task.add(task);
 notifyListeners();
 debugPrint('add task from provider');
 }
+
 
 void udpateTask(TaskModel task)async{
 await TaskService().updateTask(task);
