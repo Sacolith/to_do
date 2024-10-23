@@ -42,7 +42,7 @@ class TaskService {
   /// [conflictAlgorithm] for duplicate values
   Future<void> addTask(TaskModel task) async {
     final db = await database;
-    await db.insert('task', task.tasks(),
+    await db.insert('tasks', task.tasks(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
