@@ -4,8 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:to_do/models/task.dart';
 
 /// A class that represents the task data.
-/// [ChangeNotifier] is necessary when working with provider to alert state changes
-class TaskService extends ChangeNotifier {
+
+class TaskService  {
   
   ///Singleton Pattern Implementation for [TaskService]
   ///Ensures only 1 [TaskService] is referenced
