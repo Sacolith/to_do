@@ -3,7 +3,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do/models/task.dart';
 
-/// A class that represents the task service.
+/// A class that represents the task data.
+
 class TaskService {
   ///Singleton Pattern Implementation for [TaskService]
   ///Ensures only 1 [TaskService] is referenced
@@ -34,15 +35,6 @@ class TaskService {
     );
   }
 
-  /// Getter for the list of tasks.
-  //List<TaskModel> get tasks => _tasks;
-
-  /// Getter for the number of tasks.
-  //int get taskCount => _tasks.length;
-
-  /// Adds a new task with the given [newTaskTitle].
-  ///
-
   /// Creates new [task] using the [TaskModel] as data structure.
   /// When adding a new item to [Database] we use .insert
   /// since 'task' is the name of the table we make reference to it when using .insert
@@ -52,7 +44,6 @@ class TaskService {
     final db = await database;
     await db.insert('task', task.tasks(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-    //_tasks.add(TaskModel(name: newTaskTitle));
   }
 
   ///Creates a list of Tasks [taskcontents] from [database]
@@ -68,17 +59,19 @@ class TaskService {
   /// Updates the given [task] using .updatetask [db] and it checkes [where] the [task.name].
   ///
   /// The [task] parameter specifies the task to be updated.
-  Future <void> updateTask(TaskModel task) async{
-    final db= await database;
-    await db.update('tasks', task.tasks(),where: "name=?",whereArgs: [task.name]);
+  Future<void> updateTask(TaskModel task) async {
+    final db = await database;
+    await db
+        .update('tasks', task.tasks(), where: "name=?", whereArgs: [task.name]);
     debugPrint('Task Updated successfully');
-    //task.toggleCompleted();
   }
 
-  /// Deletes the given [task].
+  /// Deletes the given [task] with specific name.
   ///
   /// The [task] parameter specifies the task to be deleted.
-  void deleteTask(TaskModel task) {
-    //_tasks.remove(task);
+  Future<void> deleteTask(String name) async {
+    final db = await database;
+    await db.delete('tasks', where: 'name=?', whereArgs: [name]);
+    debugPrint('Task deleted successfully');
   }
 }
