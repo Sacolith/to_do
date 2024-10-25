@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/models/task.dart';
+
 import 'package:to_do/providers/task_provider.dart';
 
-
-/// A widget that represents a task card.
 class TaskCard extends StatelessWidget {
-  /// Constructs a [TaskCard] widget.
-  ///
-  
-  const TaskCard({super.key,required this.taskModel });
+  final TaskModel taskModel;
 
-final TaskModel taskModel;
-  
+  const TaskCard({super.key, required this.taskModel});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          taskModel.name,
-          style: TextStyle(
-              decoration: taskModel.isCompleted ? TextDecoration.lineThrough : null),
-        ),
-        trailing: Checkbox(
-          activeColor: Colors.lightBlueAccent,
-          value: taskModel.isCompleted,
-          onChanged: (bool? value) {
-            Provider.of<TaskProvider>(context, listen: false).toggleTaskCompletion(taskModel.name);
+    return Dismissible(
+      key: Key(taskModel.name),
+      background: Container(color: Colors.red),
+      onDismissed: (direction) {
+        // Remove the task from the provider
+        Provider.of<TaskProvider>(context, listen: false)
+            .deleteTasks(taskModel.name);
+        // Show a snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${taskModel.name} dismissed')),
+        );
+      },
+      child: Card(
+        child: ListTile(
+          title: Text(
+            taskModel.name,
+            style: TextStyle(
+              decoration:
+                  taskModel.isCompleted ? TextDecoration.lineThrough : null,
+            ),
+          ),
+          trailing: Checkbox(
+            activeColor: Colors.lightBlueAccent,
+            value: taskModel.isCompleted,
+            onChanged: (bool? value) {
+              Provider.of<TaskProvider>(context, listen: false)
+                  .toggleTaskCompletion(taskModel.name);
+            },
+          ),
+          onTap: () {
+            // what happens to task when completed?
           },
         ),
-        onTap: (){
-         // what happens to task when completed?
-        },
       ),
     );
   }
