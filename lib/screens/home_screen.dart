@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/screens/add_task_screen.dart';
+import 'package:to_do/services/task_service.dart';
 import 'package:to_do/widgets/tasks_list.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _taskCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTaskCount();
+  }
+
+  Future<void> _fetchTaskCount() async {
+    int count = await TaskService().getTaskCount();
+    setState(() {
+      _taskCount = count;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +40,11 @@ class HomeScreen extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.only(
                           bottom: MediaQuery.of(context).viewInsets.bottom),
-                      child:  AddTaskScreen(),
+                      child: AddTaskScreen(
+                        onTaskAdded: () {
+                          _fetchTaskCount();
+                        },
+                      ),
                     ),
                   ));
         },
@@ -35,17 +60,17 @@ class HomeScreen extends StatelessWidget {
               right: 30.0,
               bottom: 30.0,
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                CircleAvatar(
+                const CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 30.0,
                   child: Icon(Icons.list,
                       color: Colors.deepOrangeAccent, size: 30.0),
                 ),
-                SizedBox(height: 10.0),
-                Text(
+                const SizedBox(height: 10.0),
+                const Text(
                   'TodoApp',
                   style: TextStyle(
                     color: Colors.white,
@@ -54,8 +79,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '12 Tasks',
-                  style: TextStyle(
+                  '$_taskCount Tasks',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18.0,
                   ),

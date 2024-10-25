@@ -5,9 +5,7 @@ import 'package:to_do/models/task.dart';
 
 /// A class that represents the task data.
 
-
-class TaskService  {
-
+class TaskService {
   ///Singleton Pattern Implementation for [TaskService]
   ///Ensures only 1 [TaskService] is referenced
   static final TaskService _instance = TaskService._internal();
@@ -35,9 +33,7 @@ class TaskService  {
       },
       version: 1,
     );
-
-  }  
-
+  }
 
   /// Creates new [task] using the [TaskModel] as data structure.
   /// When adding a new item to [Database] we use .insert
@@ -49,7 +45,6 @@ class TaskService  {
     final db = await database;
     await db.insert('tasks', task.tasks(),
         conflictAlgorithm: ConflictAlgorithm.replace);
-
   }
 
   ///Creates a list of Tasks [taskcontents] from [database]
@@ -70,18 +65,23 @@ class TaskService  {
     await db
         .update('tasks', task.tasks(), where: "name=?", whereArgs: [task.name]);
     debugPrint('Task Updated successfully');
-
   }
 
   /// Deletes the given [task] with specific name.
   ///
   /// The [task] parameter specifies the task to be deleted.
 
-  Future <void> deleteTask(String name) async{
-    final db= await database;
-    await db.delete('tasks',where: 'name=?',whereArgs: [name]);
-   debugPrint('Task deleted successfully');
- 
+  Future<void> deleteTask(String name) async {
+    final db = await database;
+    await db.delete('tasks', where: 'name=?', whereArgs: [name]);
+    debugPrint('Task deleted successfully');
   }
 
+  /// Get the count of tasks in the database
+  Future<int> getTaskCount() async {
+    final db = await database;
+    final count =
+        Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM tasks'));
+    return count ?? 0;
+  }
 }

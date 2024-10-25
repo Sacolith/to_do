@@ -13,7 +13,10 @@ class TasksList extends StatelessWidget {
       builder: (context, taskData, child) {
         return ListView.builder(
           itemBuilder: (context, index) {
-            return TaskCard(taskModel: taskData.tasks[index]);
+            return TaskCard(
+              taskModel: taskData.tasks[index],
+              onTaskDeleted: () {},
+            );
           },
           itemCount: taskData.tasks.length,
         );

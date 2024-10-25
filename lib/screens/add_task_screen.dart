@@ -4,14 +4,14 @@ import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
 
 class AddTaskScreen extends StatelessWidget {
-   AddTaskScreen({super.key, this.task});
+  AddTaskScreen({super.key, this.task, required this.onTaskAdded});
 
-  final TextEditingController _nameController=TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TaskModel? task;
- 
+  final VoidCallback onTaskAdded; // Add this line
+
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: const Color(0xff757575),
       child: Container(
@@ -26,41 +26,30 @@ class AddTaskScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(task==null?
-              'Add Task':'Update task',
+            Text(
+              task == null ? 'Add Task' : 'Update task',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.deepOrangeAccent,
                 fontSize: 30.0,
               ),
             ),
-             TextField(
+            TextField(
               autofocus: true,
               controller: _nameController,
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10.0),
             ElevatedButton(
               onPressed: () {
-                     if(_nameController.text.isEmpty){
-                      return;
-                     }
-                     final tm= TaskModel(
-                      name: _nameController.text,
-                      isCompleted: task?.isCompleted ?? false,
-                      );
-                     if(task==null){
-                      //adds a new task
-                      Provider.of<TaskProvider>(context, listen:false).addTask(tm);
-                     }
-                     //updates task
-                     Provider.of<TaskProvider>(context, listen: false).udpateTask(tm);
-                    Navigator.pop(context);
+                if (_nameController.text.isNotEmpty) {
+                  // Add task to the provider or database
+                  Provider.of<TaskProvider>(context, listen: false).addTask(
+                    TaskModel(name: _nameController.text, isCompleted: false),
+                  );
+                  onTaskAdded(); // Call the callback
+                  Navigator.pop(context);
+                }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepOrangeAccent,
-              ),
-              child:  Text(task==null?'Add':'Update'),
+              child: Text(task == null ? 'Add' : 'Update'),
             ),
           ],
         ),
