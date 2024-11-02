@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/providers/task_provider.dart';
 import 'package:to_do/screens/add_task_screen.dart';
 import 'package:to_do/services/task_service.dart';
 import 'package:to_do/widgets/tasks_list.dart';
@@ -17,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchTaskCount();
+    Provider.of<TaskProvider>(context, listen: false).loadTasks();
   }
 
   Future<void> _fetchTaskCount() async {
@@ -98,7 +101,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: const TasksList(),
+              child: TasksList(
+                onTaskDeleted: () {
+                  _fetchTaskCount();
+                },
+              ),
             ),
           ),
         ],
