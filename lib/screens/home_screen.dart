@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/providers/task_provider.dart';
 import 'package:to_do/screens/add_task_screen.dart';
-import 'package:to_do/services/task_service.dart';
 import 'package:to_do/widgets/tasks_list.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,20 +12,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _taskCount = 0;
-
   @override
   void initState() {
     super.initState();
-    _fetchTaskCount();
     Provider.of<TaskProvider>(context, listen: false).loadTasks();
-  }
-
-  Future<void> _fetchTaskCount() async {
-    int count = await TaskService().getTaskCount();
-    setState(() {
-      _taskCount = count;
-    });
   }
 
   @override
@@ -37,19 +26,20 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.deepOrangeAccent,
         onPressed: () {
           showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => SingleChildScrollView(
-                    child: Container(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom),
-                      child: AddTaskScreen(
-                        onTaskAdded: () {
-                          _fetchTaskCount();
-                        },
-                      ),
-                    ),
-                  ));
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: AddTaskScreen(
+                  onTaskAdded: () {
+                    setState(() {});
+                  },
+                ),
+              ),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
@@ -81,12 +71,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Text(
-                  '$_taskCount Tasks',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                  ),
+                Consumer<TaskProvider>(
+                  builder: (context, taskProvider, child) {
+                    return Text(
+                      '${taskProvider.taskCount} Tasks',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -103,7 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: TasksList(
                 onTaskDeleted: () {
-                  _fetchTaskCount();
+                  setState(() {});
+                },
+                onTaskUndo: () {
+                  setState(() {});
                 },
               ),
             ),

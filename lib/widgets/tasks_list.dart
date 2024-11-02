@@ -5,10 +5,11 @@ import 'package:to_do/widgets/task_card.dart';
 
 /// A widget that displays a list of tasks.
 class TasksList extends StatelessWidget {
-  TasksList({super.key, required Function onTaskDeleted})
-      : _onTaskDeleted = onTaskDeleted;
+  final Function onTaskDeleted;
+  final Function onTaskUndo;
 
-  Function _onTaskDeleted;
+  const TasksList(
+      {super.key, required this.onTaskDeleted, required this.onTaskUndo});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,10 @@ class TasksList extends StatelessWidget {
             return TaskCard(
               taskModel: taskData.tasks[index],
               onTaskDeleted: () {
-                _onTaskDeleted();
+                onTaskDeleted();
+              },
+              onTaskUndo: () {
+                onTaskUndo();
               },
             );
           },

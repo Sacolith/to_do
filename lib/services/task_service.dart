@@ -29,7 +29,7 @@ class TaskService {
       path,
       onCreate: (db, version) {
         return db.execute(
-            'Create Table tasks(name TEXT PRIMARY KEY,isComplete INTEGER )');
+            'CREATE TABLE tasks(name TEXT PRIMARY KEY, isCompleted INTEGER)');
       },
       version: 1,
     );

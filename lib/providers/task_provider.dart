@@ -12,8 +12,11 @@ class TaskProvider with ChangeNotifier {
   /// Returns the list of tasks.
   List<TaskModel> get tasks => _task;
 
+  /// Returns the count of tasks.
+  int get taskCount => _task.length;
+
   /// Loads tasks asynchronously and updates the task list.
-  void loadTasks() async {
+  Future<void> loadTasks() async {
     _task = await TaskService().taskscontents();
     notifyListeners();
   }
@@ -21,7 +24,7 @@ class TaskProvider with ChangeNotifier {
   /// Adds a new task to the task list.
   ///
   /// The [task] parameter is the task to be added.
-  void addTask(TaskModel task) async {
+  Future<void> addTask(TaskModel task) async {
     await TaskService().addTask(task);
     _task.add(task);
     notifyListeners();
@@ -31,7 +34,7 @@ class TaskProvider with ChangeNotifier {
   /// Updates an existing task in the task list.
   ///
   /// The [task] parameter is the updated task.
-  void updateTask(TaskModel task) async {
+  Future<void> updateTask(TaskModel task) async {
     await TaskService().updateTask(task);
     int index = _task.indexWhere((t) => t.name == task.name);
     if (index != -1) {
@@ -44,7 +47,7 @@ class TaskProvider with ChangeNotifier {
   /// Deletes a task from the task list.
   ///
   /// The [name] parameter is the name of the task to be deleted.
-  void deleteTasks(String name) async {
+  Future<void> deleteTasks(String name) async {
     await TaskService().deleteTask(name);
     _task.removeWhere((task) => task.name == name);
     notifyListeners();
@@ -54,7 +57,7 @@ class TaskProvider with ChangeNotifier {
   /// Toggles the completion status of a task in the task list.
   ///
   /// The [name] parameter is the name of the task to be toggled.
-  void toggleTaskCompletion(String name) async {
+  Future<void> toggleTaskCompletion(String name) async {
     int index = _task.indexWhere((task) => task.name == name);
     if (index != -1) {
       TaskModel taskModel = _task[index];
@@ -62,7 +65,7 @@ class TaskProvider with ChangeNotifier {
         name: taskModel.name,
         isCompleted: !taskModel.isCompleted,
       );
-      updateTask(taskModel);
+      await updateTask(taskModel);
     }
   }
 }
