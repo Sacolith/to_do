@@ -4,7 +4,11 @@ import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  AddTaskScreen({super.key, this.task, required this.onTaskAdded});
+  AddTaskScreen({super.key, this.task, required this.onTaskAdded}) {
+    if (task != null) {
+      _nameController.text = task!.name;
+    }
+  }
 
   final TextEditingController _nameController = TextEditingController();
   final TaskModel? task;
@@ -37,16 +41,12 @@ class AddTaskScreen extends StatelessWidget {
             TextField(
               autofocus: true,
               controller: _nameController,
+              onSubmitted: (value) => _addTask(context),
             ),
             ElevatedButton(
               onPressed: () {
                 if (_nameController.text.isNotEmpty) {
-                  // Add task to the provider or database
-                  Provider.of<TaskProvider>(context, listen: false).addTask(
-                    TaskModel(name: _nameController.text, isCompleted: false),
-                  );
-                  onTaskAdded(); // Call the callback
-                  Navigator.pop(context);
+                  _addTask(context);
                 }
               },
               child: Text(task == null ? 'Add' : 'Update'),
@@ -55,5 +55,18 @@ class AddTaskScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _addTask(BuildContext context) {
+    if (_nameController.text.isNotEmpty) {
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+      if (task == null) {
+        taskProvider.addTask(TaskModel(name: _nameController.text));
+      } else {
+        taskProvider.updateTask(TaskModel(name: _nameController.text));
+      }
+      onTaskAdded(); // Add this line
+      Navigator.pop(context);
+    }
   }
 }

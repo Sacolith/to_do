@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
+import 'package:to_do/screens/add_task_screen.dart';
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends StatefulWidget {
   final TaskModel taskModel;
   final VoidCallback onTaskDeleted;
   final VoidCallback onTaskUndo;
@@ -16,11 +17,16 @@ class TaskCard extends StatelessWidget {
   });
 
   @override
+  State<TaskCard> createState() => _TaskCardState();
+}
+
+class _TaskCardState extends State<TaskCard> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Dismissible(
-        key: Key(taskModel.name),
+        key: Key(widget.taskModel.name),
         background: _buildDismissibleBackground(Alignment.centerLeft),
         secondaryBackground: _buildDismissibleBackground(Alignment.centerRight),
         onDismissed: (direction) => _handleDismiss(context),
@@ -31,16 +37,16 @@ class TaskCard extends StatelessWidget {
 
   void _handleDismiss(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    taskProvider.deleteTasks(taskModel.name);
-    onTaskDeleted();
+    taskProvider.deleteTasks(widget.taskModel.name);
+    widget.onTaskDeleted();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${taskModel.name} dismissed'),
+        content: Text('${widget.taskModel.name} dismissed'),
         action: SnackBarAction(
           label: 'UNDO',
           onPressed: () {
-            taskProvider.addTask(taskModel);
-            onTaskUndo();
+            taskProvider.addTask(widget.taskModel);
+            widget.onTaskUndo();
           },
         ),
       ),
@@ -62,22 +68,42 @@ class TaskCard extends StatelessWidget {
   }
 
   Widget _buildTaskCard(BuildContext context) {
-    return Card(
-      color: Colors.transparent,
-      child: ListTile(
-        title: Text(
-          taskModel.name,
-          style: TextStyle(
-              decoration:
-                  taskModel.isCompleted ? TextDecoration.lineThrough : null),
-        ),
-        trailing: Checkbox(
-          activeColor: Colors.deepOrangeAccent,
-          value: taskModel.isCompleted,
-          onChanged: (bool? value) {
-            Provider.of<TaskProvider>(context, listen: false)
-                .toggleTaskCompletion(taskModel.name);
-          },
+    return GestureDetector(
+      onLongPress: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: AddTaskScreen(
+                task: widget.taskModel,
+                onTaskAdded: () {
+                  setState(() {});
+                },
+              ),
+            ),
+          ),
+        );
+      },
+      child: Card(
+        child: ListTile(
+          title: Text(
+            widget.taskModel.name,
+            style: TextStyle(
+                decoration: widget.taskModel.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null),
+          ),
+          trailing: Checkbox(
+            activeColor: Colors.deepOrangeAccent,
+            value: widget.taskModel.isCompleted,
+            onChanged: (bool? value) {
+              Provider.of<TaskProvider>(context, listen: false)
+                  .toggleTaskCompletion(widget.taskModel.name);
+            },
+          ),
         ),
       ),
     );
