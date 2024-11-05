@@ -13,7 +13,7 @@ class TasksList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
-    TaskModel? _recentlyDeletedTask;
+    TaskModel? recentlyDeletedTask;
     return Consumer<TaskProvider>(
       builder: (context, taskData, child) {
         return ListView.builder(
@@ -22,23 +22,25 @@ class TasksList extends StatelessWidget {
             return TaskCard(
               taskModel: task,
               onDismissed: () async {
-                _recentlyDeletedTask = task;
+                recentlyDeletedTask = task;
                 await taskProvider.deleteTasks(task.name);
 
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${task.name} dismissed'),
-                    action: SnackBarAction(
-                      label: 'Undo',
-                      onPressed: () async {
-                        if (_recentlyDeletedTask != null) {
-                          await taskProvider.addTask(_recentlyDeletedTask!);
-                        }
-                      },
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${task.name} dismissed'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () async {
+                          if (recentlyDeletedTask != null) {
+                            await taskProvider.addTask(recentlyDeletedTask!);
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             );
           },

@@ -19,7 +19,6 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-  TaskModel? _recentlyDeletedTask;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -57,17 +56,17 @@ class _TaskCardState extends State<TaskCard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Task'),
+          title: const Text('Edit Task'),
           content: TextField(
             controller: controller,
-            decoration: InputDecoration(hintText: 'Task Name'),
+            decoration: const InputDecoration(hintText: 'Task Name'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -76,9 +75,9 @@ class _TaskCardState extends State<TaskCard> {
                   isCompleted: widget.taskModel.isCompleted,
                 );
                 await taskProvider.editTask(updatedTask);
-                Navigator.of(context).pop();
+                if (context.mounted) Navigator.of(context).pop();
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
