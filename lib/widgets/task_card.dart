@@ -17,6 +17,7 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
+  TaskModel? _recentlyDeletedTask;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -33,15 +34,19 @@ class _TaskCardState extends State<TaskCard> {
 
   void _handleDismiss(BuildContext context) async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    _recentlyDeletedTask = widget.taskModel;
     await taskProvider.deleteTasks(widget.taskModel.name);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${widget.taskModel.name} dismissed'),
         action: SnackBarAction(
-          label: 'UNDO',
-          onPressed: () {
-            taskProvider.addTask(widget.taskModel);
+          label: 'Undo',
+          onPressed: () async {
+            if (_recentlyDeletedTask != null) {
+              await taskProvider.addTask(_recentlyDeletedTask!);
+              _recentlyDeletedTask = null;
+            }
           },
         ),
       ),
