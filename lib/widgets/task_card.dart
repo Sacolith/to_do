@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
-import 'package:to_do/screens/add_task_screen.dart';
 
 class TaskCard extends StatefulWidget {
   final TaskModel taskModel;
 
+  final VoidCallback onDismissed;
+
   const TaskCard({
     super.key,
     required this.taskModel,
+    required this.onDismissed,
   });
 
   @override
@@ -26,29 +28,8 @@ class _TaskCardState extends State<TaskCard> {
         key: Key(widget.taskModel.name),
         background: _buildDismissibleBackground(Alignment.centerLeft),
         secondaryBackground: _buildDismissibleBackground(Alignment.centerRight),
-        onDismissed: (direction) => _handleDismiss(context),
+        onDismissed: (direction) => widget.onDismissed(),
         child: _buildTaskCard(context),
-      ),
-    );
-  }
-
-  void _handleDismiss(BuildContext context) async {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    _recentlyDeletedTask = widget.taskModel;
-    await taskProvider.deleteTasks(widget.taskModel.name);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${widget.taskModel.name} dismissed'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () async {
-            if (_recentlyDeletedTask != null) {
-              await taskProvider.addTask(_recentlyDeletedTask!);
-              _recentlyDeletedTask = null;
-            }
-          },
-        ),
       ),
     );
   }
@@ -67,22 +48,48 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
+  void _showEditDialog(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final TextEditingController controller =
+        TextEditingController(text: widget.taskModel.name);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Task'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'Task Name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final updatedTask = TaskModel(
+                  name: controller.text,
+                  isCompleted: widget.taskModel.isCompleted,
+                );
+                await taskProvider.editTask(updatedTask);
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildTaskCard(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) => SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: AddTaskScreen(
-                task: widget.taskModel,
-              ),
-            ),
-          ),
-        );
+        _showEditDialog(context);
       },
       child: Card(
         child: ListTile(
