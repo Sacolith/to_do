@@ -61,7 +61,6 @@ class TaskProvider with ChangeNotifier {
     debugPrint('Attempting to edit task: ${updatedTask.name}');
     debugPrint('Current tasks: ${_tasks.map((task) => task.name).toList()}');
 
-    String updatedTaskName = updatedTask.name.trim().toLowerCase();
     int index = _tasks.indexWhere((task) =>
         task.name.trim().toLowerCase() == task.name.trim().toLowerCase());
 

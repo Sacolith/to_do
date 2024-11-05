@@ -65,6 +65,6 @@ class AddTaskScreen extends StatelessWidget {
           name: _nameController.text, isCompleted: task!.isCompleted));
     }
 
-    Navigator.pop(context);
+    if (context.mounted) Navigator.pop(context);
   }
 }
