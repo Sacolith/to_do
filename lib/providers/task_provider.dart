@@ -7,17 +7,18 @@ import 'package:to_do/services/task_service.dart';
 /// This class extends [ChangeNotifier] to enable state changes when working with provider.
 /// The [notifyListeners] method is used to signal the state change to the [Provider] in [main].
 class TaskProvider with ChangeNotifier {
-  List<TaskModel> _task = [];
+  final TaskService _taskService = TaskService();
+  List<TaskModel> _tasks = [];
 
   /// Returns the list of tasks.
-  List<TaskModel> get tasks => _task;
+  List<TaskModel> get tasks => _tasks;
 
   /// Returns the count of tasks.
-  int get taskCount => _task.length;
+  int get taskCount => _tasks.length;
 
   /// Loads tasks asynchronously and updates the task list.
   Future<void> loadTasks() async {
-    _task = await TaskService().taskscontents();
+    _tasks = await _taskService.taskscontents();
     notifyListeners();
   }
 
@@ -25,8 +26,8 @@ class TaskProvider with ChangeNotifier {
   ///
   /// The [task] parameter is the task to be added.
   Future<void> addTask(TaskModel task) async {
-    await TaskService().addTask(task);
-    _task.add(task);
+    await _taskService.addTask(task);
+    _tasks.add(task);
     notifyListeners();
     debugPrint('add task from provider');
   }
@@ -35,12 +36,12 @@ class TaskProvider with ChangeNotifier {
   ///
   /// The [task] parameter is the updated task.
   Future<void> updateTask(TaskModel task) async {
-    await TaskService().updateTask(task);
-    int index = _task.indexWhere((t) => t.name == task.name);
+    int index = _tasks.indexWhere((t) => t.name == task.name);
     if (index != -1) {
-      _task[index] = task;
+      _tasks[index] = task;
       notifyListeners();
-      debugPrint('update task from provider');
+      debugPrint('${task.name} updated${task.isCompleted}');
+      await _taskService.updateTask(task);
     }
   }
 
@@ -48,24 +49,29 @@ class TaskProvider with ChangeNotifier {
   ///
   /// The [name] parameter is the name of the task to be deleted.
   Future<void> deleteTasks(String name) async {
-    await TaskService().deleteTask(name);
-    _task.removeWhere((task) => task.name == name);
+    _tasks.removeWhere((task) => task.name == name);
     notifyListeners();
-    debugPrint('delete task from provider');
+    await _taskService.deleteTask(name);
   }
 
-  /// Toggles the completion status of a task in the task list.
+  /// Edits an existing task in the task list.
   ///
-  /// The [name] parameter is the name of the task to be toggled.
-  Future<void> toggleTaskCompletion(String name) async {
-    int index = _task.indexWhere((task) => task.name == name);
+  /// The [updatedTask] parameter is the updated task.
+  Future<void> editTask(TaskModel updatedTask) async {
+    debugPrint('Attempting to edit task: ${updatedTask.name}');
+    debugPrint('Current tasks: ${_tasks.map((task) => task.name).toList()}');
+
+    String updatedTaskName = updatedTask.name.trim().toLowerCase();
+    int index = _tasks.indexWhere((task) =>
+        task.name.trim().toLowerCase() == task.name.trim().toLowerCase());
+
     if (index != -1) {
-      TaskModel taskModel = _task[index];
-      taskModel = TaskModel(
-        name: taskModel.name,
-        isCompleted: !taskModel.isCompleted,
-      );
-      await updateTask(taskModel);
+      _tasks[index] = updatedTask;
+      notifyListeners();
+      await _taskService.updateTask(updatedTask);
+      debugPrint('Task updated: ${updatedTask.name}');
+    } else {
+      debugPrint('Task not found: ${updatedTask.name}');
     }
   }
 }

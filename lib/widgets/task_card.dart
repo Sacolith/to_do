@@ -3,46 +3,33 @@ import 'package:provider/provider.dart';
 import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
 
-class TaskCard extends StatelessWidget {
+class TaskCard extends StatefulWidget {
   final TaskModel taskModel;
-  final VoidCallback onTaskDeleted;
-  final VoidCallback onTaskUndo;
+
+  final VoidCallback onDismissed;
 
   const TaskCard({
     super.key,
     required this.taskModel,
-    required this.onTaskDeleted,
-    required this.onTaskUndo,
+    required this.onDismissed,
   });
 
+  @override
+  State<TaskCard> createState() => _TaskCardState();
+}
+
+class _TaskCardState extends State<TaskCard> {
+  TaskModel? _recentlyDeletedTask;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Dismissible(
-        key: Key(taskModel.name),
+        key: Key(widget.taskModel.name),
         background: _buildDismissibleBackground(Alignment.centerLeft),
         secondaryBackground: _buildDismissibleBackground(Alignment.centerRight),
-        onDismissed: (direction) => _handleDismiss(context),
+        onDismissed: (direction) => widget.onDismissed(),
         child: _buildTaskCard(context),
-      ),
-    );
-  }
-
-  void _handleDismiss(BuildContext context) {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    taskProvider.deleteTasks(taskModel.name);
-    onTaskDeleted();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${taskModel.name} dismissed'),
-        action: SnackBarAction(
-          label: 'UNDO',
-          onPressed: () {
-            taskProvider.addTask(taskModel);
-            onTaskUndo();
-          },
-        ),
       ),
     );
   }
@@ -61,23 +48,66 @@ class TaskCard extends StatelessWidget {
     );
   }
 
+  void _showEditDialog(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final TextEditingController controller =
+        TextEditingController(text: widget.taskModel.name);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Task'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'Task Name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final updatedTask = TaskModel(
+                  name: controller.text,
+                  isCompleted: widget.taskModel.isCompleted,
+                );
+                await taskProvider.editTask(updatedTask);
+                Navigator.of(context).pop();
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildTaskCard(BuildContext context) {
-    return Card(
-      color: Colors.transparent,
-      child: ListTile(
-        title: Text(
-          taskModel.name,
-          style: TextStyle(
-              decoration:
-                  taskModel.isCompleted ? TextDecoration.lineThrough : null),
-        ),
-        trailing: Checkbox(
-          activeColor: Colors.deepOrangeAccent,
-          value: taskModel.isCompleted,
-          onChanged: (bool? value) {
-            Provider.of<TaskProvider>(context, listen: false)
-                .toggleTaskCompletion(taskModel.name);
-          },
+    return GestureDetector(
+      onLongPress: () {
+        _showEditDialog(context);
+      },
+      child: Card(
+        child: ListTile(
+          title: Text(
+            widget.taskModel.name,
+            style: TextStyle(
+                decoration: widget.taskModel.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null),
+          ),
+          trailing: Checkbox(
+            activeColor: Colors.deepOrangeAccent,
+            value: widget.taskModel.isCompleted,
+            onChanged: (bool? value) {
+              Provider.of<TaskProvider>(context, listen: false).updateTask(
+                  TaskModel(name: widget.taskModel.name, isCompleted: value!));
+            },
+          ),
         ),
       ),
     );

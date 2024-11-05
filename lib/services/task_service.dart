@@ -35,11 +35,11 @@ class TaskService {
     );
   }
 
-  /// Creates new [task] using the [TaskModel] as data structure.
-  /// When adding a new item to [Database] we use .insert
-  /// since 'task' is the name of the table we make reference to it when using .insert
-  /// local task model [task] insertes our new value into the [map] to ensure values a placed where they need to be
-  /// [conflictAlgorithm] for duplicate values
+  /// Creates a new task using the [TaskModel] data structure.
+  /// When adding a new item to the [Database], we use the .insert method.
+  /// The 'tasks' table is referenced when using .insert.
+  /// The local task model [task] is converted to a map to ensure values are placed correctly.
+  /// The [conflictAlgorithm] parameter handles duplicate values.
 
   Future<void> addTask(TaskModel task) async {
     final db = await database;
