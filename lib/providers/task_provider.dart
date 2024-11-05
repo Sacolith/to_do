@@ -27,8 +27,7 @@ class TaskProvider with ChangeNotifier {
   /// The [task] parameter is the task to be added.
   Future<void> addTask(TaskModel task) async {
     await _taskService.addTask(task);
-    _task.add(task);
-    notifyListeners();
+    await loadTasks();
     debugPrint('add task from provider');
   }
 
@@ -36,13 +35,9 @@ class TaskProvider with ChangeNotifier {
   ///
   /// The [task] parameter is the updated task.
   Future<void> updateTask(TaskModel task) async {
+    debugPrint('${task.name} updated${task.isCompleted}');
     await _taskService.updateTask(task);
-    int index = _task.indexWhere((t) => t.name == task.name);
-    if (index != -1) {
-      _task[index] = task;
-      notifyListeners();
-      debugPrint('update task from provider');
-    }
+    await loadTasks();
   }
 
   /// Deletes a task from the task list.
@@ -50,23 +45,6 @@ class TaskProvider with ChangeNotifier {
   /// The [name] parameter is the name of the task to be deleted.
   Future<void> deleteTasks(String name) async {
     await _taskService.deleteTask(name);
-    _task.removeWhere((task) => task.name == name);
-    notifyListeners();
-    debugPrint('delete task from provider');
-  }
-
-  /// Toggles the completion status of a task in the task list.
-  ///
-  /// The [name] parameter is the name of the task to be toggled.
-  Future<void> toggleTaskCompletion(String name) async {
-    int index = _task.indexWhere((task) => task.name == name);
-    if (index != -1) {
-      TaskModel taskModel = _task[index];
-      taskModel = TaskModel(
-        name: taskModel.name,
-        isCompleted: !taskModel.isCompleted,
-      );
-      await updateTask(taskModel);
-    }
+    await loadTasks();
   }
 }

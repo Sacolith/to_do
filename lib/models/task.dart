@@ -22,6 +22,7 @@ class TaskModel {
   ///Useful for adding different values of type [TaskModel] and ensuring the model stays consistent
   factory TaskModel.fromMap(Map<String, dynamic> taskmap) {
     return TaskModel(
+      // taskmap['isCompleted'] == 1 ? true : false
         name: taskmap['name'], isCompleted: taskmap['isCompleted'] == 1);
   }
 }

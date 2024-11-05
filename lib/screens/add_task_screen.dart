@@ -4,7 +4,7 @@ import 'package:to_do/models/task.dart';
 import 'package:to_do/providers/task_provider.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  AddTaskScreen({super.key, this.task, required this.onTaskAdded}) {
+  AddTaskScreen({super.key, this.task}) {
     if (task != null) {
       _nameController.text = task!.name;
     }
@@ -12,7 +12,6 @@ class AddTaskScreen extends StatelessWidget {
 
   final TextEditingController _nameController = TextEditingController();
   final TaskModel? task;
-  final VoidCallback onTaskAdded; // Add this line
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +56,15 @@ class AddTaskScreen extends StatelessWidget {
     );
   }
 
-  void _addTask(BuildContext context) {
-    if (_nameController.text.isNotEmpty) {
-      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-      if (task == null) {
-        taskProvider.addTask(TaskModel(name: _nameController.text));
-      } else {
-        taskProvider.updateTask(TaskModel(name: _nameController.text));
-      }
-      onTaskAdded(); // Add this line
-      Navigator.pop(context);
+  void _addTask(BuildContext context) async {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    if (task == null) {
+      await taskProvider.addTask(TaskModel(name: _nameController.text));
+    } else {
+      await taskProvider.updateTask(TaskModel(
+          name: _nameController.text, isCompleted: task!.isCompleted));
     }
+
+    Navigator.pop(context);
   }
 }

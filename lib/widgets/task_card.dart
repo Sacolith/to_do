@@ -6,14 +6,10 @@ import 'package:to_do/screens/add_task_screen.dart';
 
 class TaskCard extends StatefulWidget {
   final TaskModel taskModel;
-  final VoidCallback onTaskDeleted;
-  final VoidCallback onTaskUndo;
 
   const TaskCard({
     super.key,
     required this.taskModel,
-    required this.onTaskDeleted,
-    required this.onTaskUndo,
   });
 
   @override
@@ -35,10 +31,10 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
-  void _handleDismiss(BuildContext context) {
+  void _handleDismiss(BuildContext context) async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    taskProvider.deleteTasks(widget.taskModel.name);
-    widget.onTaskDeleted();
+    await taskProvider.deleteTasks(widget.taskModel.name);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${widget.taskModel.name} dismissed'),
@@ -46,7 +42,6 @@ class _TaskCardState extends State<TaskCard> {
           label: 'UNDO',
           onPressed: () {
             taskProvider.addTask(widget.taskModel);
-            widget.onTaskUndo();
           },
         ),
       ),
@@ -79,9 +74,6 @@ class _TaskCardState extends State<TaskCard> {
                   bottom: MediaQuery.of(context).viewInsets.bottom),
               child: AddTaskScreen(
                 task: widget.taskModel,
-                onTaskAdded: () {
-                  setState(() {});
-                },
               ),
             ),
           ),
@@ -100,8 +92,8 @@ class _TaskCardState extends State<TaskCard> {
             activeColor: Colors.deepOrangeAccent,
             value: widget.taskModel.isCompleted,
             onChanged: (bool? value) {
-              Provider.of<TaskProvider>(context, listen: false)
-                  .toggleTaskCompletion(widget.taskModel.name);
+              Provider.of<TaskProvider>(context, listen: false).updateTask(
+                  TaskModel(name: widget.taskModel.name, isCompleted: value!));
             },
           ),
         ),

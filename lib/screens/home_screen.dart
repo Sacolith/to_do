@@ -32,11 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: AddTaskScreen(
-                  onTaskAdded: () {
-                    setState(() {});
-                  },
-                ),
+                child: AddTaskScreen(),
               ),
             ),
           );
@@ -95,14 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: TasksList(
-                onTaskDeleted: () {
-                  setState(() {});
-                },
-                onTaskUndo: () {
-                  setState(() {});
-                },
-              ),
+              child: const TasksList(),
             ),
           ),
         ],
